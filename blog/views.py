@@ -17,14 +17,15 @@ from blog.serializers import MenSerializer
 
 class MenAPIView(APIView):
     def get(self, request):
-        # return Response({'title': 'Bread Peat'})
-        lst = Men.objects.all().values()
-        return Response(lst)
-
+        m_model = Men.objects.all()
+        return Response({'posts': MenSerializer(m_model, many=True).data})
     def post(self, request):
+        """Check form is valid & send msg"""
+        serializer = MenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         post_new = Men.objects.create(
             title=request.data['title'],
             content=request.data['content'],
             category_id=request.data['category_id'],
         )
-        return Response({'post': model_to_dict(post_new)})
+        return Response({'post': MenSerializer(post_new).data})

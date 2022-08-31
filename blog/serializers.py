@@ -1,16 +1,6 @@
-import io
-
 from rest_framework import serializers
-from rest_framework.parsers import JSONParser
-from rest_framework.renderers import JSONRenderer
 
 from blog.models import Men
-
-
-# class MenModel:
-#     def __init__(self, title, content):
-#         self.title = title
-#         self.content = content
 
 
 class MenSerializer(serializers.Serializer):
@@ -21,18 +11,17 @@ class MenSerializer(serializers.Serializer):
     is_published = serializers.BooleanField(default=True)
     category_id = serializers.IntegerField()
 
+    def create(self, validated_data):
+        return Men.objects.create(**validated_data)
 
-# def encode():
-#     model = MenModel("Jali", "Angilen")
-#     model_sr = MenSerializer(model)
-#     print(model_sr, type(model_sr.data), sep='\n')
-#     json = JSONRenderer().render(model_sr.data)
-#     print(json)
-#
-#
-# def decode():
-#     stream = io.BytesIO(b'{"title": "Angelina Jolie", "content": "Contetnt: Anjelina Jolie"}')
-#     data = JSONParser().parse(stream)
-#     serializer = MenSerializer(data=data)
-#     serializer.is_valid()
-#     print(serializer.validated_data)
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get("title", instance.title)
+        instance.content = validated_data.get("content", instance.content)
+        instance.time_update = validated_data.get("time_update", instance.time_update)
+        instance.is_published = validated_data.get("is_published", instance.is_published)
+        instance.category_id = validated_data.get("category_id", instance.category_id)
+        instance.save()
+        return instance
+
+    def delete(self, instance):
+        return Men.objects.delete(instance)

@@ -21,4 +21,5 @@ from blog.views import MenAPIView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', MenAPIView.as_view()),
+    path('api/<int:pk>', MenAPIView.as_view()),
 ]

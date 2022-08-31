@@ -19,6 +19,7 @@ class MenAPIView(APIView):
     def get(self, request):
         m_model = Men.objects.all()
         return Response({'posts': MenSerializer(m_model, many=True).data})
+
     def post(self, request):
         """Check form is valid & send msg"""
         serializer = MenSerializer(data=request.data)
@@ -28,4 +29,32 @@ class MenAPIView(APIView):
             content=request.data['content'],
             category_id=request.data['category_id'],
         )
-        return Response({'post': MenSerializer(post_new).data})
+        return Response({'post': serializer.data})
+
+    def put(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method Put not allowed"})
+
+        try:
+            instance = Men.objects.get(pk=pk)
+        except:
+            return Response({"error": "Object does not exists"})
+
+        serializer = MenSerializer(data=request.data, instance=instance)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"post": serializer.data})
+
+    def delete(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method DELETE not allowed"})
+
+        try:
+            instance = Men.objects.get(pk=pk)
+        except:
+            return Response({"error": "Object does not exists"})
+
+        serializer = MenSerializer(instance=instance)
+        return Response({"post": "delete post " + str(pk)})

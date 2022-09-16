@@ -1,6 +1,5 @@
 # ViewSet CRUD
 
-[ViewSet](https://www.django-rest-framework.org/api-guide/viewsets/#custom-viewset-base-classes)<br />
 [Router](https://www.django-rest-framework.org/api-guide/routers/#simplerouter)
 
 ```python

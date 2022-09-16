@@ -6,28 +6,48 @@
 ```python
 views.py
 
-class MenViewSet(viewsets.ModelViewSet):    # ReadOnlyModelViewSet get()
-    # ModelViewSet include > mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, mixins.ListModelMixin, GenericViewSet
+class MenViewSet(viewsets.ModelViewSet):  # ReadOnlyModelViewSet get()
     """ CRUD all by one class """
-    queryset = Men.objects.all()
+    # queryset = Men.objects.all()
     serializer_class = MenSerializer
+
+    def get_queryset(self):
+        """return just given numb of el"""
+        pk = self.kwargs.get('pk')
+        if not pk:
+            last = (len(Men.objects.all()))-3
+            return Men.objects.all()[last:]
+        
+        return Men.objects.filter(pk=pk)
+
+    @action(methods=["GET"], detail=True)      # http://127.0.0.1:8000/api/category/   detail return one element
+    def category(self, request, pk):
+        cats = Category.objects.get(pk=pk)
+        return Response({'cats': cats.name})
+
 ```
 
-```python
+```
 urls.py 
 
-router = routers.SimpleRouter()
-router.register(r'', views.MenViewSet)
+DefaultRouter > show all urls which router
+    router = routers.DefaultRouter()
+    
+    {
+        "men": "http://127.0.0.1:8000/api/men/"
+    }
 
+SimpleRouter > show just API without routering
+
+    -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+router = routers.SimpleRouter()
+router.register(r'', views.MenViewSet, basename='men')  # basename need when in ModelViewSet not use queryset(model)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls))  # http://127.0.0.1:8000/api/{router_url}
-
-
-    # path('api/', views.MenViewSet.as_view({'get': 'list'})),    # enter method in as_view()
-    # path('api/<int:pk>', views.MenViewSet.as_view({'put': 'update'})),
 ]
 
-]
+
 ```

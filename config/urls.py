@@ -21,14 +21,10 @@ from blog import views
 
 
 router = routers.SimpleRouter()
-router.register(r'', views.MenViewSet)
+router.register(r'', views.MenViewSet, basename='men')  # basename need when in ModelViewSet not use queryset(model)
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls))  # http://127.0.0.1:8000/api/{router_url}
-
-
-    # path('api/', views.MenViewSet.as_view({'get': 'list'})),    # enter method in as_view()
-    # path('api/<int:pk>', views.MenViewSet.as_view({'put': 'update'})),
 ]

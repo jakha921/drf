@@ -16,10 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from blog.views import MenAPIView
+from blog import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', MenAPIView.as_view()),
-    path('api/<int:pk>', MenAPIView.as_view()),
+    path('api/', views.MenAPIList.as_view()),
+    path('api/<int:pk>', views.MenAPIView.as_view()),
 ]

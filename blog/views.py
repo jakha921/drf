@@ -15,6 +15,10 @@ from blog.serializers import MenSerializer
 #     serializer_class = MenSerializer
 
 
+class MenAPIList(generics.ListCreateAPIView):
+    queryset = Men.objects.all()
+    serializer_class = MenSerializer
+
 class MenAPIView(APIView):
     def get(self, request):
         m_model = Men.objects.all()

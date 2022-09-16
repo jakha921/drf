@@ -125,3 +125,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    # Control dfr permission & etc globally
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+
+        # get in comment when project give to realise
+        'rest_framework.renderers.BrowsableAPIRenderer',    # give permission for to browser for CRUD
+    ],
+}

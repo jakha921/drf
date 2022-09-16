@@ -5,29 +5,40 @@
 ```python
 views.py
 
-class MenAPIList(generics.ListCreateAPIView):
+class MenAPIUpdate(generics.UpdateAPIView):
+    """List operation"""
     queryset = Men.objects.all()
     serializer_class = MenSerializer
-```
 
-```python 
-serializers.py
 
-class MenSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Men
-        fields = ('title', 'content', 'is_published',)
-
+class MenAPIDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """CRUD operation"""
+    queryset = Men.objects.all()
+    serializer_class = MenSerializer
 ```
 
 ```python
 urls.py 
 
-from blog import views
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', views.MenAPIList.as_view()),
-    path('api/<int:pk>', views.MenAPIView.as_view()),
+    path('api/<int:pk>', views.MenAPIUpdate.as_view()),
+    path('api/detail/<int:pk>', views.MenAPIDetailView.as_view()),
 ]
+```
+
+```python
+settings.py
+
+REST_FRAMEWORK = {
+    # Control dfr permission & etc globally
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+
+        # get in comment when project give to realise
+        'rest_framework.renderers.BrowsableAPIRenderer',    # give permission for to browser for CRUD
+    ],
+}
+
 ```

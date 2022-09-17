@@ -1,16 +1,17 @@
 from rest_framework import viewsets, generics
-from rest_framework.decorators import permission_classes
+from rest_framework.authentication import TokenAuthentication
 
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny
 
 from blog.models import Men, Category
 from blog.serializers import MenSerializer
-from permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
+from blog.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 
 
 class MenAPIList(generics.ListCreateAPIView):
     serializer_class = MenSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication, )    # get just by token not allowed to sessions(login from drf)
 
     def get_queryset(self):
         """return just given numb of el"""

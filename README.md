@@ -1,90 +1,42 @@
-# Permission class & custom permissions
+# Djoser auth
 
-[Permission](https://www.django-rest-framework.org/api-guide/permissions/)
+[Djoser](https://djoser.readthedocs.io/en/latest/index.html)<br />
+[Base Endpoints](https://djoser.readthedocs.io/en/latest/base_endpoints.html#base-endpoints)
+
+
 
 ```python
-models.py
+settings.py
 
-from django.contrib.auth.models import User
+pip install djoser  # install command 
 
-class Men(models.Model):
+INSTALLED_APPS = [
     ...
-    user = models.ForeignKey(User, verbose_name='user', on_delete=models.CASCADE)
+    'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
+]
+
+python manage.py migrate    # command migrate
+
+REST_FRAMEWORK = {
+    ...
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',    # djoser
+        'rest_framework.authentication.BasicAuthentication',    # default settings
+        'rest_framework.authentication.SessionAuthentication',  # default settings
+    ]
+}
+
 ```
 
 ```python
 views.py
 
-from rest_framework.permissions import IsAuthenticated, \
-    IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny
-from permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
-
-
 class MenAPIList(generics.ListCreateAPIView):
-    serializer_class = MenSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
-
-    def get_queryset(self):
-        """return just given numb of el"""
-        last = (len(Men.objects.all())) - 3
-        return Men.objects.all()[last:]
-
-
-class MenAPIUpdate(generics.RetrieveUpdateAPIView):
-    queryset = Men.objects.all()
-    serializer_class = MenSerializer
-    permission_classes = (IsOwnerOrReadOnly,)
-
-
-class MenAPIDestroy(generics.RetrieveDestroyAPIView):
-    """get() & delete()"""
-    queryset = Men.objects.all()
-    serializer_class = MenSerializer
-    permission_classes = (IsAdminOrReadOnly,)
-
-```
-
-```python
-permissions.py
-
-from rest_framework import permissions
-
-
-class IsAdminOrReadOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        return bool(request.user and request.user.is_staff)
-
-
-class IsOwnerOrReadOnly(permissions.BasePermission):
-    """
-    Object-level permission to only allow owners of an object to edit it.
-    Assumes the model instance has an `owner` attribute.
-    """
-
-    def has_object_permission(self, request, view, obj):
-        # Read permissions are allowed to any request,
-        # so we'll always allow GET, HEAD or OPTIONS requests.
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        # Instance must have an attribute named `owner`.
-        return obj.user == request.user
-
-```
-
-```python
-serializers.py
-
-class MenSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
-    class Meta:
-        model = Men
-        fields = '__all__'
-
+    ...
+    # get just by token not allowed to sessions(login from drf)
+    authentication_classes = (TokenAuthentication, )    
 ```
 
 
@@ -92,23 +44,25 @@ class MenSerializer(serializers.ModelSerializer):
 urls.py 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', views.MenAPIList.as_view()),
-    path('api/<int:pk>/', views.MenAPIUpdate.as_view()),
-    path('api/delete/<int:pk>/', views.MenAPIDestroy.as_view()),
+    ...
+    # auth url for logining on drf (give token by session)
+    path('api/auth/', include('rest_framework.urls')),
+    path('api/auth/', include('djoser.urls')),
+    re_path(r'^auth/', include('djoser.urls.authtoken')),  # url/auth/token/login/
+    # re_path(r'^auth/', include('djoser.urls.jwt')),         # JWT auth
 ]
 ```
 
 ```python
+# create user by Base Endpoints(on header)
+# send username, password & email to url below for registration user
+url/auth/users/
 
-global permission
+# to take a token send username & password to url below
+auth/token/login/
+# return token for using
 
-REST_FRAMEWORK = {
-    ...
-    
-    # global permissions. If you give permission in permission classes than will work.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ]
-}
+# for destroying token send Authorization Token {token} to url below
+/auth/token/logout/
+
 ```

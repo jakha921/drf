@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
 
     'blog',
 ]
@@ -131,5 +133,10 @@ REST_FRAMEWORK = {
     # global permissions. If you give permission in permission classes than will work.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',    # djoser
+        'rest_framework.authentication.BasicAuthentication',    # default settings
+        'rest_framework.authentication.SessionAuthentication',  # default settings
     ]
 }

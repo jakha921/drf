@@ -1,27 +1,31 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
+from rest_framework.decorators import permission_classes
 
-from rest_framework.decorators import action
-from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny
 
 from blog.models import Men, Category
 from blog.serializers import MenSerializer
+from permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 
 
-class MenViewSet(viewsets.ModelViewSet):  # ReadOnlyModelViewSet get()
-    """ CRUD all by one class """
-    # queryset = Men.objects.all()
+class MenAPIList(generics.ListCreateAPIView):
     serializer_class = MenSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         """return just given numb of el"""
-        pk = self.kwargs.get('pk')
-        if not pk:
-            last = (len(Men.objects.all()))-3
-            return Men.objects.all()[last:]
+        last = (len(Men.objects.all())) - 3
+        return Men.objects.all()[last:]
 
-        return Men.objects.filter(pk=pk)
 
-    @action(methods=["GET"], detail=True)      # http://127.0.0.1:8000/api/category/   detail return one element
-    def category(self, request, pk):
-        cats = Category.objects.get(pk=pk)
-        return Response({'cats': cats.name})
+class MenAPIUpdate(generics.RetrieveUpdateAPIView):
+    queryset = Men.objects.all()
+    serializer_class = MenSerializer
+    permission_classes = (IsOwnerOrReadOnly,)
+
+
+class MenAPIDestroy(generics.RetrieveDestroyAPIView):
+    """get() & delete()"""
+    queryset = Men.objects.all()
+    serializer_class = MenSerializer
+    permission_classes = (IsAdminOrReadOnly,)

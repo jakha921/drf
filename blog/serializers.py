@@ -4,6 +4,8 @@ from blog.models import Men
 
 
 class MenSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = Men
-        fields = ('title', 'content', 'is_published',)
+        fields = '__all__'

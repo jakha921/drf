@@ -9,14 +9,10 @@ from blog.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 
 
 class MenAPIList(generics.ListCreateAPIView):
+    queryset = Men.objects.all()
     serializer_class = MenSerializer
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication, )    # get just by token not allowed to sessions(login from drf)
-
-    def get_queryset(self):
-        """return just given numb of el"""
-        last = (len(Men.objects.all())) - 3
-        return Men.objects.all()[last:]
+    # authentication_classes = (TokenAuthentication, )    # get just by token not allowed to sessions(login from drf)
 
 
 class MenAPIUpdate(generics.RetrieveUpdateAPIView):

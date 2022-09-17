@@ -18,6 +18,7 @@ from django.urls import path, include, re_path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 from blog import views
+from .drf_yasg import urlpatterns as doc_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,3 +34,5 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),   # JWT refresh token
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),      # JWT verify token
 ]
+
+urlpatterns += doc_urlpatterns

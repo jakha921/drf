@@ -1,33 +1,52 @@
-# Pagination
+# Swagger autodocumentation
 
-[Pagination](https://www.django-rest-framework.org/api-guide/pagination/)<br />
+[drf-yasg](https://drf-yasg.readthedocs.io/en/stable/readme.html#usage)<br />
 
 
 
 ```python
+pip install drf-yasg
+
 settings.py
 
-REST_FRAMEWORK = {
-    ...
-    # Pagination
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 3,
+INSTALLED_APPS = [
+   ...
+   'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
+   'drf_yasg',
+   ...
+]
 ```
 
 ```python
-views.py
+drf_yasg.py
 
-from rest_framework.pagination import PageNumberPagination
+from django.urls import path
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Men API",
+        default_version='',
+        description="Men`s API documentation\n<code>/redoc</code> another docs",
+        contact=openapi.Contact(name='Jakha921'),
+    ),
+    public=True,
+    permission_classes=[permissions.IsAuthenticated],
+)
 
-class MenAPIListPagination(PageNumberPagination):
-    page_size = 3   # show given el in one page
-    page_size_query_param = 'page_size' # edit page size > url&page_size=4
-    max_page_size = 10000
+urlpatterns = [
+    path('docs(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),    # download documentation in some format
+    path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),   # documentation
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),         # another documentation
+]  
+```
 
+```python
+url.py
 
-class MenAPIList(generics.ListCreateAPIView):
-    ...
-    pagination_class = MenAPIListPagination
-  
+from .drf_yasg import urlpatterns as doc_urlpatterns
+
+urlpatterns += doc_urlpatterns
 ```
